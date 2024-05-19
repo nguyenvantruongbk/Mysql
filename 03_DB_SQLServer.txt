@@ -1,0 +1,252 @@
+1.TuDuy
+duTungThongTinMot.thongTinCuaDoiTuongNaoThiTaoBangDoiTuongDo
+
+2. KIEU BIEN
+varchar(20)  => TEL,NAME/ '987654321'
+text => address /'111 Nguyen Trai, Thanh Xuan, Ha Noi'
+int => id /1000
+DATETIME => order_date, /'2019-11-19 15:30:27'
+DATE =>BOD
+DECIMA(14,2) => total price
+
+3.syntax
+tenBang: nouns
+tenBien: ten_bien
+cuoiCauLenh: ;
+tu khoa: vietHoa;
+ghiChu: --
+thucHienCauLenh: BoiTungCauLenh
+
+4.lamViecVoiDatabase:CRUDE (CreatReadUpdateDelete)
+--Create
+CREATE TABLE nouns(tenBien1 kieubien1 astribute1 astribute2, tenBien2 kieuBien2,....,tenBienn kieuBienn);
+	cacAstribute:tenBienn kieuBienn astribute1 astribute2
+		PRIMARY KEY //tuKhoaChinh
+		IDENTITY(1,1)//tu dong tang 1 don vi
+		FOREIGN KEY REFERENCES tables(tenbien)// tuKhoaNgoai
+		NOT NULL //khongDuocDeTrong
+		UNIQUE //DuyNhat
+		CHECK(tenbienn >= a AND tenbienn <=b)//KiemTraDieuKienData
+
+
+--Read
+
+//Truy van
+SELECT * FROM tablenames;
+SELECT tenBien1 AS hienThiTenBien1,tenBienn AS hienThiTenBienn FROM tablenames;
+
+//loc data
+SELECT * FROM tablenames WHERE tenbien1>a AND tenbien1<b OR tenbien1>c
+WHERE tenbien1 IN(a1,a2,a3,a4,a5) // tenbien1 = a1 OR tenbien1 =a2 OR tenbien1=a3
+
+//tim kiem
+WHERE tenbien1 LIKE '%data%' OR tenbien2 LIKE '%data%';
+
+//Sap xep
+SELECT * FROM tablenames ORDER BY tenbien1 ASC;//sap xep tang dan
+SELECT * FROM tablename ORDER BY tenbien1 DESC;//sap xep giam dan
+
+//Sap xep + Loc + Gioi han
+SELECT TOP 5// TOP 50 PERCENT * FROM tablenames WHERE tenbien 1 > a1 ORDER BY tenbien ASC/DESC
+
+//Thong ke
+SELECT COUNT() FROM tablenames; // dem so luong hang
+SELECT SUM(tenbien1) FROM tablenames;//tinh tong bien1
+--thong ke nhieu truong
+SELECT COUNT() as TenMaHoa,SUM(tenbien1) as Mota1, AVG(tenbien2) as Mota2 FROM tablenames;
+--thong ke nang cao
+SELECT SUM(tenBien1) as Mota1, tenbien2 FROM tablenames WHERE tenbien1>1000 GROUP BY tenbien2; 
+
+--subquery loc, thong ke du lieu X o bang A thoa man dieu kien duoc loc tu bang B
+SELECT SUM(tenbien1) as Mota1 FROM tablenamesA WHERE tenbienX IN (SELECT tenbienX FROM tablenameB WHERE tenbienk LIKE 'XYZ'); 
+SELECT * FROM tableA WHERE tenbien1 IN (SELECT tenbien1 FROM tableB WHERE tenbienX IN (SELECT tenbienX FROM tableC WHERE tenbienk LIKE 'XYZ');
+
+--joint: LEFT LayBangAdeMoRongThemCotLayTuBangBNgayCaKhongCoDataTuBangB; INER LayPhanChung
+//tableA LEFT|RIGHT|INER JOIN tableB ON tableA.tenbien1 = tableB.tenbien2: 
+SELECT A.tenbien1,A.tenbien2,B.tenbien1 FROM tableA A LEFT JOIN tableB B ON A.tenbienX=B.tenbienY LEFT JOIN ....;
+
+--Priority Khi truy van data
+FROM | JOIN | ON | WHERE |GROUP BY| HAVING|ORDER BY|LIMIT,TOP|SELECT
+
+
+--Update
+INSERT INTO tablenames(tenbien1, tenbien2,tenbienn) VALUES(data1,data2,datan),(data1,data2,datan);
+
+--Delete
+DROP TABLE tablenames;
+		
+===================================================
+Bao Mat He Thong
+--View
+CREATE VIEW view_tableA AS SELECT A.bien1 AS MoTa1, B.bienz AS Motaz FROM table_Combined(tableA A LEFT JOIN tableB B ON A.bienx=B.bieny __ LEFT JOIN tableC C ON...);
+// FROM databaseX.dbo.tableA; //ke noi cung luc toi nhieu Database khac
+tim kiem
+SELECT * FROM view_tableA;
+--cap nhat data 
+CREATE PROCEDURE procedure_name @Mota1 kieubien1, @Mota2 kieuBien2
+	AS
+		IF EXISTS (SELECT * FROM tableA WHERE bienX = @MotaX)
+
+//
+CREATE PROCEDURE add_order @total DECIMAL(14,2), @date DATETIME, @tel varchar(20) 
+	AS 
+		IF EXISTS (SELECT * FROM customers WHERE tel = @tel) 
+			BEGIN 
+				INSERT INTO orders (grand_total,order_date,customer_tel) VALUES(@total,@date,@tel); 
+			END 
+		ELSE PRINT 'Please select exist customer telephone';  
+		
+==================================================================================
+-----------
+Example
+==================================================================================
+---------------------------------------------------------------------------------------------------------------------
+---SQL 1
+CREATE TABLE customers( 
+-- list all columns 
+tel varchar(20) PRIMARY KEY, customer_name varchar(255), customer_address text );
+
+--- DROP TABLE customers; 
+CREATE TABLE products( id int PRIMARY KEY IDENTITY(1,1), product_name varchar(255), price decimal(14,2), unit varchar(20), product_description text );
+
+CREATE TABLE orders( id int PRIMARY KEY IDENTITY(1,1), order_date DATETIME, grand_total DECIMAL(14,2), customer_tel varchar(20) FOREIGN KEY REFERENCES customers(tel) );
+
+CREATE TABLE order_products( order_id int FOREIGN KEY REFERENCES orders(id), product_id int FOREIGN KEY REFERENCES products(id), qty int, total decimal(14,2) );
+---------------------------------------------------------------------------------------------------------------------
+---SQL 2
+CREATE TABLE departments( id varchar(20) PRIMARY KEY, name varchar(100) NOT NULL UNIQUE ); 
+CREATE TABLE machines( id varchar(20) PRIMARY KEY, name varchar(100) NOT NULL ); 
+CREATE TABLE employees( id int PRIMARY KEY IDENTITY(1,1), name varchar(150) NOT NULL, dob DATE, salary varchar(10), 
+			address text, tel varchar(20) NOT NULL UNIQUE, job_title varchar(50), education varchar(50), 
+			department_id varchar(20) NOT NULL FOREIGN KEY REFERENCES departments(id) ); 
+CREATE TABLE employee_machines( employee_id int NOT NULL FOREIGN KEY REFERENCES employees(id), machine_id VARCHAR(20) NOT NULL FOREIGN KEY REFERENCES machines(id), qty int NOT NULL CHECK(qty > 0) );
+---------------------------------------------------------------------------------------------------------------------
+---SQL 3
+CREATE TABLE classes( id varchar(20) PRIMARY KEY, name varchar(100) NOT NULL UNIQUE, room varchar(20) ); 
+CREATE TABLE students( id varchar(20) PRIMARY KEY, name varchar(100) NOT NULL, dob DATE ); 
+CREATE TABLE subjects( id varchar(20) PRIMARY KEY, name varchar(150) NOT NULL UNIQUE ); 
+CREATE TABLE results( id int PRIMARY KEY IDENTITY(1,1), mark int NOT NULL CHECK(mark >= 0 AND mark <=10), 
+						result varchar(50) NOT NULL, student_id varchar(20) NOT NULL REFERENCES students(id), subject_id varchar(20) NOT NULL REFERENCES subjects(id) ); 
+CREATE TABLE student_subjects( student_id varchar(20) NOT NULL REFERENCES students(id), subject_id varchar(20) NOT NULL REFERENCES subjects(id) );
+
+--drop TABLE students;
+
+---------------------------------------------------------------------------------------------------------------------
+---SQL 4
+-- create data 
+INSERT INTO customers(tel,customer_name,customer_address) VALUES('987654321','Nguyen Van An','111 Nguyen Trai, Thanh Xuan, Ha Noi');
+
+INSERT INTO orders(order_date,grand_total,customer_tel) VALUES('2019-11-19 15:30:27',1500,'987654321');
+
+INSERT INTO products(product_name,price,unit,product_description) VALUES('May Tinh T450',1000,'Chiec','May nhap moi'), ('Dien thoai Nokia 5670',2000,'Chiec','Dien thoai dang hot'), ('May in Samsung 450',100,'Chiec','May in dang e');
+
+INSERT INTO order_products(order_id,product_id,qty,total) VALUES(1,1,1,1000), (1,2,2,400), (1,3,1,100); 
+INSERT INTO order_products(order_id,product_id,qty,total) VALUES(3,1,1,1000), (3,2,2,400), (3,3,1,100); 
+-- Read data 
+SELECT * FROM customers; SELECT * FROM orders; SELECT * FROM products; SELECT * FROM order_products;
+---------------------------------------------------------------------------------------------------------------------
+---SQL 5
+INSERT INTO departments(id,name) VALUES('HCNS','Hanh chinh nhan su');
+
+INSERT INTO machines(id,name) VALUES('MTDB-21','May tinh de ban'), ('MIHP','May in HP');
+
+INSERT INTO employees(name,dob,salary,address,tel,job_title,education,department_id) VALUES('Nguyen Van An','1995-03-28','U2','Cau Giay, Ha Noi','0987654321','Nhan vien hanh chinh', 'Cu nhan','HCNS');
+
+SELECT * FROM employees; 
+INSERT INTO employee_machines(employee_id,machine_id,qty) VALUES(1,'MTDB-21',1),(1,'MIHP',1);
+
+---------------------------------------------------------------------------------------------------------------------
+---SQL 6
+
+-- truy van co ban 
+SELECT * FROM products; 
+SELECT id,product_name as tensanpham,product_description,price as gia_tien FROM products; 
+-- lọc dữ liệu 
+SELECT * FROM products WHERE price > 200 ; 
+SELECT * FROM products WHERE price > 200 AND id > 1; 
+SELECT * FROM products WHERE price > 2000 OR price < 200; 
+SELECT * FROM products WHERE id = 1 OR id = 2 OR id = 3; 
+SELECT * FROM products WHERE id IN (1,2,3,4,5,6,7,8); 
+SELECT * FROM products WHERE product_name = 'May Tinh T450'; 
+SELECT * FROM products WHERE product_name LIKE 'May Tinh T450'; 
+-- Tim kiem 
+SELECT * FROM products WHERE product_name LIKE 'May Tinh T45%'; 
+SELECT * FROM products WHERE product_name LIKE '%450'; 
+SELECT * FROM products WHERE product_name LIKE '%in%' OR product_description LIKE '%in%'; 
+-- Sap xep 
+SELECT * FROM products ORDER BY price asc; 
+SELECT * FROM products ORDER BY price desc; 
+SELECT * FROM products WHERE price > 200 ORDER BY price desc; 
+SELECT TOP 1 * FROM products ORDER BY price desc; 
+--MYSQL: 
+SELECT * FROM products ORDER BY price desc LIMIT 1;
+SELECT TOP 50 PERCENT * FROM products ORDER BY price desc; 
+-- thong ke 
+SELECT COUNT() FROM products; SELECT COUNT() FROM orders; 
+SELECT SUM(grand_total) FROM orders; 
+SELECT COUNT(*) as soluong,SUM(grand_total) as tongtien, AVG(grand_total) as trungbinh FROM orders; 
+-- thong ke nang cao 
+SELECT SUM(grand_total) as tongtien, customer_tel FROM orders GROUP BY customer_tel; 
+SELECT SUM(grand_total) as tongtien, customer_tel FROM orders WHERE grand_total > 1000 GROUP BY customer_tel HAVING SUM(grand_total) > 3000; 
+-- subquery 
+SELECT SUM(grand_total) as tongtien from orders WHERE customer_tel
+IN (SELECT tel FROM customers WHERE customer_name LIKE 'Nguyen Van An'); 
+--- tim xem Nguyen Van An da mua nhung san pham gi 
+SELECT * FROM products WHERE id IN (SELECT DISTINCT product_id FROM order_products WHERE order_id IN ( SELECT id from orders WHERE customer_tel IN (SELECT tel FROM customers WHERE customer_name LIKE 'Nguyen Van An')));
+
+---------------------------------------------------------------------------------------------------------------------
+---SQL 7
+SELECT orders.*,customers.customer_name,customers.customer_address FROM orders LEFT JOIN customers ON orders.customer_tel = customers.tel;
+
+SELECT orders.*,customers.customer_name,customers.customer_address FROM orders INNER JOIN customers ON orders.customer_tel = customers.tel;
+
+SELECT orders.*,customers.customer_name,customers.customer_address FROM orders RIGHT JOIN customers ON orders.customer_tel = customers.tel;
+
+SELECT * FROM orders; SELECT * FROM customers;
+
+---SELECT (column1,column2....) FROM A [LEFT|INNER|RIGHT] JOIN B ON A.FK = B.PK [LEFT|INNER|RIGHT] JOIN C ON A.FK | B.FK = C.PK ....
+
+SELECT * FROM order_products LEFT JOIN products ON order_products.product_id = products.id LEFT JOIN orders ON order_products.order_id = orders.id LEFT JOIN customers ON orders.customer_tel = customers.tel;
+
+SELECT A.order_id,A.product_id,B.product_name,A.qty, A.total, C.grand_total, D.customer_name 
+FROM order_products A LEFT JOIN (SELECT * FROM products where qty > 2) B ON A.product_id = B.id LEFT JOIN (SELECT * from orders WHERE customer_tel != NULL) C ON A.order_id = C.id LEFT JOIN customers D ON C.customer_tel = D.tel;
+---------------------------------------------------------------------------------------------------------------------
+---SQL 8
+-- FROM JOIN[..] ON[...] WHERE GROUP BY HAVING ORDER BY LIMIT(TOP ..) SELECT
+
+SELECT A.order_id,A.product_id,B.product_name,A.qty, A.total, C.grand_total, D.customer_name FROM order_products A LEFT JOIN products B ON A.product_id = B.id LEFT JOIN orders C ON A.order_id = C.id LEFT JOIN customers D ON C.customer_tel = D.tel WHERE B.price > 100 ;
+
+-- View CREATE VIEW all_data AS SELECT A.order_id,A.product_id,B.product_name,A.qty, A.total, C.grand_total, D.customer_name FROM order_products A LEFT JOIN products B ON A.product_id = B.id LEFT JOIN orders C ON A.order_id = C.id LEFT JOIN customers D ON C.customer_tel = D.tel;
+
+SELECT * FROM all_data;
+
+CREATE VIEW view_employees AS SELECT id as maso, name as fullname, tel as dienthoai FROM T2311E_LAB2.dbo.employees;
+
+SELECT * from view_employees WHERE maso > 0;
+
+CREATE PROCEDURE insert_product @name varchar(255), @price DECIMAL(14,2), @unit VARCHAR(20), @des text 
+AS 
+	IF @price > 500 
+		BEGIN 
+			INSERT INTO products(product_name,price,unit,product_description) VALUES(@name,@price,@unit,@des); 
+		END 
+	ELSE PRINT 'Khong ban do` re tien';
+
+EXECUTE insert_product @name='Samsung Galaxy S21', @price=2500,@unit='chiec',@des ='May dien thjoai moi';
+
+DROP PROCEDURE insert_product;
+
+SELECT * FROM products;
+
+CREATE PROCEDURE add_order @total DECIMAL(14,2), @date DATETIME, @tel varchar(20) 
+	AS 
+		IF EXISTS (SELECT * FROM customers WHERE tel = @tel) 
+			BEGIN 
+				INSERT INTO orders (grand_total,order_date,customer_tel) VALUES(@total,@date,@tel); 
+			END 
+		ELSE PRINT 'Please select exist customer telephone';
+
+
+		
+
+
